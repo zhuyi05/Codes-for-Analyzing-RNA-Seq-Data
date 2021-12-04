@@ -1,0 +1,57 @@
+#DESeq2 commands#
+library(DESeq2)
+CountMatrix <- as.matrix(read.csv("D:/Rtemp/RNAseq_CountMatrix.tabular", sep = "\t", row.names = "Geneid", check.names = FALSE))
+factordata <- read.csv("D:/Rtemp/RNAseq_factordata.tabular", sep = "\t", row.names = "SampleName")
+dataset <- DESeqDataSetFromMatrix(countData = CountMatrix, colData = factordata, design = ~ Treatment)
+dataset <- DESeq(dataset)
+res1 <- results(dataset, contrast = c("Treatment", "RecombinedAptamerNoWnt", "ControlAptamerNoWnt"))
+res2 <- results(dataset, contrast = c("Treatment", "RecombinedAptamerWithWnt", "ControlAptamerWithWnt"))
+
+#Order the genes in the results according to adjusted p-value#
+res1_ordered <- res1[order(res1$padj),]
+res2_ordered <- res2[order(res2$padj),]
+
+write.csv(res1_ordered, "RNASeq_DESeq2Results_NoWnt.csv")
+write.csv(res2_ordered, "RNASeq_DESeq2Results_WithWnt.csv")
+
+#Volcano Plot#
+library(EnhancedVolcano)
+#Import Annotated DESeq2 Results#
+RNASeq_NoWnt_DESeq2Results_Annotated <- read.csv("D:/Rtemp/RNASeq_DESeq2Results_NoWnt_Annotated.tabular", sep = "\t", check.names = FALSE)
+keyvals <- ifelse(RNASeq_NoWnt_DESeq2Results_Annotated$padj >= 0.05, "grey", ifelse(RNASeq_NoWnt_DESeq2Results_Annotated$log2FoldChange < -1, '#619cff', ifelse(RNASeq_NoWnt_DESeq2Results_Annotated$log2FoldChange > 1, '#f8766d', 'grey')))
+keyvals[is.na(keyvals)] <- 'grey'
+names(keyvals)[keyvals == '#f8766d'] <- 'Up'
+names(keyvals)[keyvals == '#619cff'] <- 'Down'
+names(keyvals)[keyvals == 'grey'] <- 'Not Sig'
+EnhancedVolcano(RNASeq_NoWnt_DESeq2Results_Annotated, lab = RNASeq_NoWnt_DESeq2Results_Annotated$SYMBOL, x="log2FoldChange", y="padj", ylab = bquote(~-Log[10]~ "P.adj"), pCutoff = 0.05, pointSize = 2, title = "Differential Gene Expression, Wnt-", subtitle = "Recombined v.s. Control Aptamers", labSize = 5, colCustom = keyvals, colAlpha = 1, boxedLabels = TRUE, drawConnectors = TRUE, widthConnectors = 0.5, arrowheads = FALSE, legendPosition = "top", cutoffLineType = "dotted", cutoffLineWidth = 1,  gridlines.major = FALSE, gridlines.minor = FALSE, caption = NULL, xlim = c(-4,6), ylim = c(0, 22))
+
+RNASeq_WithWnt_DESeq2Results_Annotated <- read.csv("D:/Rtemp/RNASeq_DESeq2Results_WithWnt_Annotated.tabular", sep = "\t", check.names = FALSE)
+keyvals <- ifelse(RNASeq_WithWnt_DESeq2Results_Annotated$padj >= 0.05, "grey", ifelse(RNASeq_WithWnt_DESeq2Results_Annotated$log2FoldChange < -1, '#619cff', ifelse(RNASeq_WithWnt_DESeq2Results_Annotated$log2FoldChange > 1, '#f8766d', 'grey')))
+keyvals[is.na(keyvals)] <- 'grey'
+names(keyvals)[keyvals == '#f8766d'] <- 'Up'
+names(keyvals)[keyvals == '#619cff'] <- 'Down'
+names(keyvals)[keyvals == 'grey'] <- 'Not Sig'
+EnhancedVolcano(RNASeq_WithWnt_DESeq2Results_Annotated, lab = RNASeq_WithWnt_DESeq2Results_Annotated$SYMBOL, x="log2FoldChange", y="padj", ylab = bquote(~-Log[10]~ "P.adj"), pCutoff = 0.05, pointSize = 2, title = "Differential Gene Expression, Wnt+", subtitle = "Recombined v.s. Control Aptamers", labSize = 5, colCustom = keyvals, colAlpha = 1, boxedLabels = TRUE, drawConnectors = TRUE, widthConnectors = 0.5, arrowheads = FALSE, legendPosition = "top", cutoffLineType = "dotted", cutoffLineWidth = 1,  gridlines.major = FALSE, gridlines.minor = FALSE, caption = NULL, xlim = c(-6,4), ylim = c(0, 22))
+
+
+#DESeq2 on RNA-Seq_Ac5S Data
+library(DESeq2)
+CountMatrix_Ac5S <- as.matrix(read.csv("D:/Rtemp/RNAseq_CountMatrix_Ac5S.tabular", sep = "\t", row.names = "Geneid", check.names = FALSE))
+factordata_Ac5S <- read.csv("D:/Rtemp/RNAseq_factordata_Ac5S.tabular", sep = "\t", row.names = "SampleName")
+dataset_Ac5S <- DESeqDataSetFromMatrix(countData = CountMatrix_Ac5S, colData = factordata_Ac5S, design = ~ Treatment)
+dataset_Ac5S <- DESeq(dataset_Ac5S)
+res1_Ac5S <- results(dataset_Ac5S, contrast = c("Treatment", "RecombinedAptamerNoWnt", "ControlAptamerNoWnt"))
+res2_Ac5S <- results(dataset_Ac5S, contrast = c("Treatment", "RecombinedAptamerWithWnt", "ControlAptamerWithWnt"))
+#Order the genes in the results according to adjusted p-value#
+res1_Ac5S_ordered <- res1_Ac5S[order(res1_Ac5S$pvalue),]
+res2_Ac5S_ordered <- res2_Ac5S[order(res2_Ac5S$pvalue),]
+
+write.csv(res1_Ac5S_ordered, "RNASeq_Ac5S_DESeq2Results_NoWnt.csv")
+write.csv(res2_Ac5S_ordered, "RNASeq_Ac5S_DESeq2Results_WithWnt.csv")
+
+#Volcano Plot#
+library(EnhancedVolcano)
+RNASeq_Ac5S_NoWnt_DESeq2Results_Annotated <- read.csv("D:/Rtemp/RNASeq_Ac5S_DESeq2Results_NoWnt_Annotated.tabular", sep = "\t", check.names = FALSE)
+RNASeq_Ac5S_WithWnt_DESeq2Results_Annotated <- read.csv("D:/Rtemp/RNASeq_Ac5S_DESeq2Results_WithWnt_Annotated.tabular", sep = "\t", check.names = FALSE)
+EnhancedVolcano(RNASeq_Ac5S_NoWnt_DESeq2Results_Annotated, lab = RNASeq_Ac5S_NoWnt_DESeq2Results_Annotated$SYMBOL, x="log2FoldChange", y="padj", ylab = bquote(~-Log[10]~ "P.adj"), pCutoff = 0.05, pointSize = 2, title = "Differential Gene Expression, Ac5S, Wnt-", subtitle = "Recombined v.s. Control Aptamers", labSize = 5, col = c("grey", "grey", "grey", "#f8766d"), colAlpha = 1, boxedLabels = TRUE, drawConnectors = TRUE, widthConnectors = 1, arrowheads = FALSE, legendPosition = "NONE", cutoffLineType = "dotted", cutoffLineWidth = 1,  gridlines.major = FALSE, gridlines.minor = FALSE, caption = NULL, xlim = c(-4,6), ylim = c(0, 22))
+EnhancedVolcano(RNASeq_Ac5S_WithWnt_DESeq2Results_Annotated, lab = RNASeq_Ac5S_WithWnt_DESeq2Results_Annotated$SYMBOL, x="log2FoldChange", y="padj", ylab = bquote(~-Log[10]~ "P.adj"), pCutoff = 0.05, pointSize = 2, title = "Differential Gene Expression, Ac5S, Wnt+", subtitle = "Recombined v.s. Control Aptamers", labSize = 5, col = c("grey", "grey", "grey", "#619cff"), colAlpha = 1, boxedLabels = TRUE, drawConnectors = TRUE, widthConnectors = 1, arrowheads = FALSE, legendPosition = "NONE", cutoffLineType = "dotted", cutoffLineWidth = 1,  gridlines.major = FALSE, gridlines.minor = FALSE, caption = NULL, xlim = c(-6,4), ylim = c(0, 22))
